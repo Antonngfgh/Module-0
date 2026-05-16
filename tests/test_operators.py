@@ -108,7 +108,15 @@ def test_sigmoid(a: float) -> None:
     * It is  strictly increasing.
     """
     # TODO: Implement for Task 0.2.
-    raise NotImplementedError("Need to implement for Task 0.2")
+    s = sigmoid(a)
+    assert 0.0 <= s <= 1.0
+    assert_close(1.0 - s, sigmoid(-a))
+    if a == 0.0:
+        assert_close(s, 0.5)
+    eps = 1e-5
+    if abs(a) < 1e6:
+        s_next = sigmoid(a + eps)
+        assert s_next >= s - 1e-12
 
 
 @pytest.mark.task0_2
@@ -116,7 +124,8 @@ def test_sigmoid(a: float) -> None:
 def test_transitive(a: float, b: float, c: float) -> None:
     """Test the transitive property of less-than (a < b and b < c implies a < c)"""
     # TODO: Implement for Task 0.2.
-    raise NotImplementedError("Need to implement for Task 0.2")
+    if lt(a, b) == 1.0 and lt(b, c) == 1.0:
+        assert lt(a, c) == 1.0
 
 
 @pytest.mark.task0_2
@@ -125,8 +134,15 @@ def test_symmetric() -> None:
     gives the same value regardless of the order of its input.
     """
     # TODO: Implement for Task 0.2.
-    raise NotImplementedError("Need to implement for Task 0.2")
+    from hypothesis import given
+    from .strategies import small_floats, assert_close
+    from minitorch.operators import mul
 
+    @given(small_floats, small_floats)
+    def _check(x: float, y: float) -> None:
+        assert_close(mul(x, y), mul(y, x))
+
+    _check()
 
 @pytest.mark.task0_2
 def test_distribute() -> None:
@@ -134,14 +150,33 @@ def test_distribute() -> None:
     :math:`z \times (x + y) = z \times x + z \times y`
     """
     # TODO: Implement for Task 0.2.
-    raise NotImplementedError("Need to implement for Task 0.2")
+    from hypothesis import given
+    from .strategies import small_floats, assert_close
+    from minitorch.operators import mul, add
+
+    @given(small_floats, small_floats, small_floats)
+    def _check(z: float, x: float, y: float) -> None:
+        left = mul(z, add(x, y))
+        right = add(mul(z, x), mul(z, y))
+        assert_close(left, right)
+
+    _check()
 
 
 @pytest.mark.task0_2
 def test_other() -> None:
     """Write a test that ensures some other property holds for your functions."""
     # TODO: Implement for Task 0.2.
-    raise NotImplementedError("Need to implement for Task 0.2")
+    from hypothesis import given
+    from .strategies import small_floats, assert_close
+    from minitorch.operators import inv
+
+    @given(small_floats)
+    def _check(a: float) -> None:
+        if a != 0.0:   # inv(0) не определён
+            assert_close(inv(inv(a)), a)
+
+    _check()
 
 
 # ## Task 0.3  - Higher-order functions
@@ -169,7 +204,10 @@ def test_sum_distribute(ls1: List[float], ls2: List[float]) -> None:
     is the same as the sum of each element of `ls1` plus each element of `ls2`.
     """
     # TODO: Implement for Task 0.3.
-    raise NotImplementedError("Need to implement for Task 0.3")
+    sum1 = minitorch.operators.sum(ls1)
+    sum2 = minitorch.operators.sum(ls2)
+    sum_pairwise = minitorch.operators.sum([a + b for a, b in zip(ls1, ls2)])
+    assert_close(sum1 + sum2, sum_pairwise)
 
 
 @pytest.mark.task0_3

@@ -25,6 +25,8 @@ def make_scatters(graph, model=None, size=50):
                 zmax=0.8,
                 line_smoothing=0.5,
                 colorscale=colorscale,
+                ncontours=1,                      #рисуем только один контур
+                contours=dict(showlabels=False),  #отключаем подписи
                 opacity=0.6,
                 showscale=False,
             )
